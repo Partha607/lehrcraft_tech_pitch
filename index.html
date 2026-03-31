@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lehrcraft.art – Technical Pitch & Architecture</title>
+<style>
+  :root{
+    --bg:#08090c;
+    --bg-2:#0d1016;
+    --cream:#f3eddc;
+    --text:#f4efdf;
+    --muted:#c8c0ac;
+    --ink:#091018;
+    --blue:#3947e3;
+    --yellow:#efc62e;
+    --teal:#38b6ad;
+    --coral:#ef6f74;
+    --card:#121723;
+    --line:rgba(255,255,255,.12);
+    --shadow:0 18px 42px rgba(0,0,0,.32);
+    --radius:30px;
+    --radius-sm:22px;
+    --max:1280px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at 1px 1px, rgba(57,71,227,.16) 1px, transparent 0) 0 0/12px 12px,
+      linear-gradient(180deg, #06070a 0%, #0a0d12 100%);
+    -webkit-font-smoothing:antialiased;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
+  .site-header{
+    position:sticky; top:0; z-index:10;
+    background:rgba(8,9,12,.76); backdrop-filter: blur(10px);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:88px;}
+  .brand{font-size:30px; font-weight:700; letter-spacing:-.04em; color:white; text-decoration:none; white-space:nowrap}
+  .brand .star{color:var(--coral); position:relative; top:-10px; left:2px; font-size:28px;}
+  .nav-links,.nav-meta{display:flex; gap:28px; align-items:center; color:var(--cream);}
+  .nav a{color:inherit; text-decoration:none; font-size:16px; opacity:.92; transition: opacity 0.2s;}
+  .nav a:hover{opacity:1; color: var(--yellow);}
+  
+  /* HERO */
+  .hero{padding:70px 0 60px;}
+  .hero-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:44px; align-items:center;}
+  .eyebrow{font-size:14px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:20px; font-weight: 600;}
+  h1{font-size:72px; line-height:1; letter-spacing:-.05em; margin:0 0 22px; max-width:680px;}
+  .hero p{font-size:24px; line-height:1.4; color:#f2ead5; max-width:730px; margin:0 0 28px; font-weight: 300;}
+  .hero-copy{padding:24px 0;}
+  .button-row{display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+  .btn{display:inline-flex; align-items:center; gap:16px; padding:0; border-radius:18px; text-decoration:none; overflow:hidden; box-shadow:var(--shadow); transition: transform 0.2s;}
+  .btn:hover{transform: translateY(-2px);}
+  .btn-main{background:var(--blue); color:white;}
+  .btn-main span:first-child{padding:18px 26px; font-size:22px; font-weight:600;}
+  .btn-main span:last-child{display:grid; place-items:center; width:68px; height:64px; background:#f2f0eb; color:var(--blue); font-size:36px; line-height:1;}
+  .chip-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:22px;}
+  .chip{padding:10px 18px; border-radius:999px; border:2px solid rgba(255,255,255,.3); color:var(--cream); font-weight:600; background:rgba(255,255,255,.05); font-size:14px;}
+  .chip.fill-blue{background:var(--blue); border-color:transparent}
+  .chip.fill-teal{background:var(--teal); border-color:transparent}
+  .chip.fill-coral{background:var(--coral); border-color:transparent}
+  .chip.fill-yellow{background:var(--yellow); border-color:transparent; color:#17130b}
+
+  .hero-art{position:relative; min-height:560px;}
+  .planet{position:absolute; border-radius:50%; display:grid; place-items:center; text-align:center; box-shadow:var(--shadow); overflow:hidden;}
+  .planet.large{width:360px; height:360px; right:40px; top:40px; background:linear-gradient(135deg, var(--teal), #1f8a82);}
+  .planet.small{width:220px; height:220px; right:0; bottom:20px; background:linear-gradient(135deg, var(--coral), #c25256);}
+  .planet .planet-label{font-size:38px; line-height:1; font-weight:800; letter-spacing:-.06em; color:#1f0e10; mix-blend-mode:overlay; opacity: 0.8;}
+  .hero-card{position:absolute; left:-40px; bottom:80px; width:340px; background:#f1efe8; color:#111; border-radius:30px; padding:26px; box-shadow:var(--shadow); z-index: 2;}
+  .hero-card h3{margin:0 0 10px; font-size:22px; letter-spacing:-.03em; color: var(--blue);}
+  .hero-card p{margin:0; font-size:15px; color:#4d4d4d; line-height:1.5; font-weight: 500;}
+
+  /* SECTIONS */
+  .section{padding:80px 0;}
+  .section.light{
+    color:#0d1118;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(0,0,0,.06) 1px, transparent 0) 0 0/16px 16px,
+      var(--cream);
+  }
+  .section.dark{background:transparent;}
+  .section-head{margin-bottom:40px;}
+  .section-head .overline{font-size:16px; text-transform:uppercase; letter-spacing:.1em; color: var(--yellow); font-weight: 700; margin-bottom:12px;}
+  .section.light .section-head .overline { color: var(--blue); }
+  .section-head h2{font-size:56px; line-height:1.05; letter-spacing:-.04em; margin:0 0 16px;}
+  .section-head p{font-size:20px; line-height:1.6; max-width:860px; margin:0; opacity:.9}
+  .underline-swoosh{width:120px; height:6px; margin:20px 0 0; background:var(--yellow); border-radius:999px;}
+
+  /* VALUE GRID (AI/LLM) */
+  .value-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:30px;}
+  .value-box{background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:28px; padding:30px; backdrop-filter: blur(8px); transition: transform 0.2s, background 0.2s;}
+  .value-box:hover{background:rgba(255,255,255,.06); transform: translateY(-4px);}
+  .value-box h3{font-size:22px; margin:0 0 12px; letter-spacing:-.03em; color: white;}
+  .value-box p{font-size:15px; line-height:1.6; color:var(--muted); margin:0}
+
+  /* ARCH GRID */
+  .arch-grid{display:grid; grid-template-columns:1fr; gap:24px; align-items:start;}
+  .svg-shell{background:rgba(255,255,255,.02); border:1px solid var(--line); border-radius:32px; padding:24px; box-shadow:var(--shadow)}
+  svg{width:100%; height:auto; display:block}
+
+  /* SPEC GRID */
+  .spec-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:24px; margin-top:30px;}
+  .spec-card{border-radius:30px; padding:36px; box-shadow:var(--shadow); position: relative; overflow: hidden;}
+  .spec-card.dark{background:#101520; border:1px solid var(--line)}
+  .spec-card.cream{background:#faf5e9; color:#111}
+  .spec-card h3{margin:0 0 20px; font-size:28px; letter-spacing:-.04em; font-weight: 800;}
+  .spec-card ul{margin:0; padding-left:20px}
+  .spec-card li{margin-bottom:12px; font-size:16px; line-height:1.5; font-weight: 500; color: #444;}
+  .spec-card.dark li { color: #ddd; }
+  .spec-card .tech-icon { position: absolute; top: -20px; right: -20px; font-size: 140px; opacity: 0.04; font-weight: 900; line-height: 1; pointer-events: none; }
+
+  /* DB SCHEMA GRID */
+  .schema-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:20px;}
+  .schema-box{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:24px; padding:26px}
+  .schema-box h4{margin:0 0 14px; font-size:20px; color: var(--teal); letter-spacing:-.02em}
+  .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; line-height: 1.6; color: #a5b4fc; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; }
+  .code-font span.key { color: #fca5a5; }
+  .code-font span.type { color: #6ee7b7; }
+
+  /* FINAL GRID */
+  .final-grid{display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center;}
+  .quote-box{background:#faf5e9; color:#111; border-radius:32px; padding:40px; box-shadow:var(--shadow)}
+  .quote-box p{font-size:26px; line-height:1.35; letter-spacing:-.03em; margin:0 0 20px; font-weight: 700; color: var(--blue);}
+  .quote-box .small{font-size:16px; line-height:1.6; color:#444; margin:0; font-weight: 500;}
+
+  /* LABEL BADGES */
+  .badge{display:inline-block; padding:6px 14px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.08em; margin-bottom:12px; text-transform: uppercase;}
+  .badge-ai{background:rgba(239,198,46,.15); color:var(--yellow); border:1px solid rgba(239,198,46,.3)}
+  .badge-core{background:rgba(57,71,227,.15); color:#8892f8; border:1px solid rgba(57,71,227,.3)}
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px){
+    .hero-grid, .final-grid {grid-template-columns:1fr}
+    .value-grid, .schema-grid {grid-template-columns:1fr 1fr}
+    .spec-grid {grid-template-columns:1fr}
+    .hero-art{min-height:480px}
+    .hero-card{position:relative; left:0; bottom:0; margin-top:20px; width:100%; z-index: 10;}
+  }
+  @media (max-width: 768px){
+    .nav-links, .nav-meta{display:none}
+    h1{font-size:48px}
+    .section-head h2{font-size:40px}
+    .hero p{font-size:20px}
+    .value-grid, .schema-grid {grid-template-columns:1fr}
+    .planet.large{width:260px; height:260px;}
+    .planet.small{width:160px; height:160px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+<div class="wrap nav">
+  <a class="brand" href="#top">Lehrcraft<span style="font-weight: 300; opacity: 0.7;">.Art</span></a>
+  <nav class="nav-links">
+    <a href="#architecture">Architecture</a>
+    <a href="#deployment">Deployment</a>
+    <a href="#ai-engine">AI Engine</a>
+    <a href="#database">Database & Scale</a>
+  </nav>
+  <div class="nav-meta">
+    <a href="#investment" style="color: var(--yellow); font-weight: 600;">Investor Summary</a>
+  </div>
+</div>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="hero">
+<div class="wrap hero-grid">
+  <div class="hero-copy">
+    <div class="eyebrow">Technical Due Diligence · 1st April 2026</div>
+    <h1>Scalable. AI-Native.<br>Built for Education.</h1>
+    <p>The technical foundation powering the production and distribution of DACH's leading multimedia learning units. Engineered for rapid content scaling via LLM orchestration and secure, role-based distribution.</p>
+    <div class="button-row">
+      <a class="btn btn-main" href="#architecture"><span>Explore Architecture</span><span>↓</span></a>
+    </div>
+    <div class="chip-row">
+      <div class="chip fill-blue">Next.js 14</div>
+      <div class="chip fill-yellow">FastAPI (Python)</div>
+      <div class="chip fill-teal">PostgreSQL + ChromaDB</div>
+      <div class="chip fill-coral">OpenAI / Anthropic RAG</div>
+    </div>
+  </div>
+  <div aria-hidden="true" class="hero-art">
+    <div class="planet large">
+      <div class="planet-label" style="font-size: 32px;">Lehrcraft.Art</div>
+    </div>
+    <div class="planet small">
+      <div class="planet-label" style="font-size: 24px;">RAG</div>
+    </div>
+    <div class="hero-card">
+      <h3>Phase 1 Readiness</h3>
+      <p>Production-grade Next.js frontends, FastAPI gateway, and multi-model LLM orchestration layer fully mapped out. CI/CD ready for deployment.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ARCHITECTURE DIAGRAM -->
+<section class="section dark" id="architecture">
+<div class="wrap">
+  <div class="section-head">
+    <div class="overline">System Overview</div>
+    <h2>High-Level System Architecture</h2>
+    <div class="underline-swoosh"></div>
+    <p style="margin-top:18px;">A robust, decoupled architecture designed for high availability, secure B2B/B2C content delivery, and heavy AI inference lifting entirely abstracted behind a central API gateway.</p>
+  </div>
+
+  <div class="arch-grid">
+    <div class="svg-shell">
+      <svg aria-label="Lehrcraft System Architecture" viewBox="0 0 800 780">
+        <defs>
+          <filter id="glow"><feGaussianBlur result="b" stdDeviation="6"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+
+        <!-- BG -->
+        <rect fill="rgba(255,255,255,.01)" height="750" rx="24" stroke="rgba(255,255,255,.08)" width="770" x="15" y="15"/>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="12" font-weight="700" letter-spacing="2" text-anchor="middle" x="400" y="44">LEHRCRAFT SYSTEM TOPOLOGY</text>
+
+        <!-- TIER 1: CLIENTS -->
+        <rect fill="#101520" height="70" rx="12" stroke="rgba(56,182,173,.5)" stroke-width="1.5" width="280" x="80" y="70"/>
+        <text fill="#38b6ad" font-family="Inter,sans-serif" font-size="14" font-weight="700" text-anchor="middle" x="220" y="94">Creator Web Application</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="220" y="112">Next.js · AI Chat Pane · Live Preview</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="220" y="128">Magazine Library Browser</text>
+
+        <rect fill="#101520" height="70" rx="12" stroke="rgba(56,182,173,.5)" stroke-width="1.5" width="280" x="440" y="70"/>
+        <text fill="#38b6ad" font-family="Inter,sans-serif" font-size="14" font-weight="700" text-anchor="middle" x="580" y="94">Student/Teacher Application</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="580" y="112">Next.js · Content Viewer · Media Player</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="580" y="128">Progress & Achievement Dashboard</text>
+
+        <!-- Connections to Gateway -->
+        <line stroke="#efc62e" stroke-width="2" x1="220" x2="220" y1="140" y2="200"/>
+        <line stroke="#efc62e" stroke-width="2" x1="580" x2="580" y1="140" y2="200"/>
+        
+        <line stroke="rgba(255,255,255,.2)" stroke-dasharray="4" stroke-width="1" x1="80" x2="720" y1="170" y2="170"/>
+        <text fill="#666" font-family="monospace" font-size="11" x="90" y="165">HTTPS / WSS (TLS 1.3)</text>
+
+        <!-- TIER 2: API GATEWAY (FASTAPI) -->
+        <rect fill="rgba(239,198,46,.1)" height="120" rx="16" stroke="#efc62e" stroke-width="1.5" width="640" x="80" y="200"/>
+        <text fill="#efc62e" font-family="Inter,sans-serif" font-size="15" font-weight="800" letter-spacing="1" text-anchor="middle" x="400" y="225">API GATEWAY & ROUTING LAYER (FastAPI)</text>
+        
+        <rect fill="rgba(255,255,255,.05)" height="36" rx="8" width="180" x="110" y="240"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="200" y="262">REST Server (Auth, CRUD)</text>
+
+        <rect fill="rgba(255,255,255,.05)" height="36" rx="8" width="180" x="310" y="240"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="400" y="262">WebSocket (AI Chat Rooms)</text>
+
+        <rect fill="rgba(255,255,255,.05)" height="36" rx="8" width="180" x="510" y="240"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="600" y="262">Background Workers</text>
+
+        <!-- Auth Middleware -->
+        <rect fill="rgba(255,255,255,.02)" height="24" rx="6" stroke="rgba(255,255,255,.1)" width="580" x="110" y="285"/>
+        <text fill="#c8c0ac" font-family="monospace" font-size="10" text-anchor="middle" x="400" y="301">Authentication Middleware: JWT Validation &bull; RBAC &bull; Rate Limiting</text>
+
+        <!-- Connections to Services -->
+        <line stroke="#efc62e" stroke-width="2" x1="220" x2="220" y1="320" y2="380"/>
+        <line stroke="#efc62e" stroke-width="2" x1="580" x2="580" y1="320" y2="380"/>
+
+        <!-- TIER 3: SERVICES & AI -->
+        <rect fill="rgba(57,71,227,.15)" height="160" rx="16" stroke="#3947e3" stroke-width="1.5" width="300" x="80" y="380"/>
+        <text fill="#8892f8" font-family="Inter,sans-serif" font-size="14" font-weight="700" letter-spacing="1" text-anchor="middle" x="230" y="405">CORE SERVICES LAYER</text>
+        
+        <rect fill="rgba(255,255,255,.03)" height="30" rx="6" width="260" x="100" y="420"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" x="110" y="440">User Management (Registration, Auth)</text>
+
+        <rect fill="rgba(255,255,255,.03)" height="30" rx="6" width="260" x="100" y="460"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" x="110" y="480">Content & Magazine Engine</text>
+
+        <rect fill="rgba(255,255,255,.03)" height="30" rx="6" width="260" x="100" y="500"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" x="110" y="520">Analytics & Event Aggregation</text>
+
+
+        <rect fill="rgba(239,111,116,.15)" height="160" rx="16" stroke="#ef6f74" stroke-width="1.5" width="300" x="420" y="380"/>
+        <text fill="#ef6f74" font-family="Inter,sans-serif" font-size="14" font-weight="700" letter-spacing="1" text-anchor="middle" x="570" y="405">AI ORCHESTRATION LAYER</text>
+
+        <rect fill="rgba(255,255,255,.03)" height="30" rx="6" width="260" x="440" y="420"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" x="450" y="440">Multi-LLM Hub (OpenAI / Anthropic)</text>
+
+        <rect fill="rgba(255,255,255,.03)" height="30" rx="6" width="260" x="440" y="460"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" x="450" y="480">RAG Engine (LangChain / ChromaDB)</text>
+
+        <rect fill="rgba(255,255,255,.03)" height="30" rx="6" width="260" x="440" y="500"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" x="450" y="520">Content Generator (DALL-E, Formatting)</text>
+
+        <!-- Connections to Data -->
+        <line stroke="#efc62e" stroke-width="2" x1="230" x2="230" y1="540" y2="600"/>
+        <line stroke="#efc62e" stroke-width="2" x1="570" x2="570" y1="540" y2="600"/>
+        <line stroke="#efc62e" stroke-width="2" x1="400" x2="400" y1="540" y2="600"/>
+
+        <!-- TIER 4: DATA -->
+        <rect fill="#121723" height="100" rx="16" stroke="rgba(255,255,255,.15)" stroke-width="1" width="640" x="80" y="600"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="14" font-weight="700" letter-spacing="1" text-anchor="middle" x="400" y="625">DATA LAYER</text>
+
+        <circle cx="200" cy="660" fill="#3947e3" filter="url(#glow)" opacity=".9" r="28"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="800" text-anchor="middle" x="200" y="658">PG</text>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="9" font-weight="800" text-anchor="middle" x="200" y="670">SQL</text>
+
+        <circle cx="400" cy="660" fill="#ef6f74" filter="url(#glow)" opacity=".9" r="28"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="800" text-anchor="middle" x="400" y="658">Vector</text>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="9" font-weight="800" text-anchor="middle" x="400" y="670">DB</text>
+
+        <circle cx="600" cy="660" fill="#38b6ad" filter="url(#glow)" opacity=".9" r="28"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="800" text-anchor="middle" x="600" y="658">S3</text>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="9" font-weight="800" text-anchor="middle" x="600" y="670">(India)</text>
+
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="200" y="705">Germany: GDPR Data</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="400" y="705">Embeddings, AI RAG</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="600" y="705">India: Media Content</text>
+
+      </svg>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- DEPLOYMENT ARCHITECTURE -->
+<section class="section light" id="deployment">
+<div class="wrap">
+  <div class="section-head">
+    <div class="overline">Infrastructure Strategy</div>
+    <h2>Deployment Architecture</h2>
+    <div class="underline-swoosh"></div>
+    <p style="margin-top:18px;">Built on Docker Compose for deterministic environments and deployed across distributed CDNs. <strong>Strategic Data Split:</strong> Sensitive user data is strictly held in Germany (Hetzner/PostgreSQL) for absolute GDPR compliance, while heavy media content is offloaded to AWS S3 buckets in India for massive cost reduction.</p>
+  </div>
+
+  <div class="arch-grid">
+    <div class="svg-shell" style="background:#121723;">
+      <svg aria-label="Lehrcraft Deployment Architecture" viewBox="0 0 800 620">
+        <defs>
+          <filter id="glowDark"><feGaussianBlur result="b" stdDeviation="6"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        
+        <!-- Cloudflare CDN -->
+        <rect fill="rgba(255,255,255,.05)" height="60" rx="12" stroke="#f48120" stroke-width="1.5" width="400" x="200" y="30"/>
+        <text fill="#f48120" font-family="Inter,sans-serif" font-size="16" font-weight="800" letter-spacing="1" text-anchor="middle" x="400" y="58">CLOUDFLARE CDN (Global)</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="400" y="75">DDoS Protection • SSL Termination • Edge Caching</text>
+
+        <!-- Connections Down -->
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="90" y2="140"/>
+
+        <!-- Hosting Boundary -->
+        <rect fill="transparent" height="320" rx="16" stroke="rgba(255,255,255,.15)" stroke-dasharray="8 4" stroke-width="2" width="700" x="50" y="140"/>
+        <text fill="#fff" font-family="monospace" font-size="12" letter-spacing="1" x="70" y="165">GERMANY HOSTING (Strict GDPR Boundary)</text>
+
+        <!-- Load Balancer -->
+        <rect fill="#1f2937" height="50" rx="8" stroke="#38b6ad" stroke-width="1.5" width="240" x="280" y="180"/>
+        <text fill="#38b6ad" font-family="Inter,sans-serif" font-size="14" font-weight="700" text-anchor="middle" x="400" y="210">Nginx Load Balancer</text>
+
+        <!-- Connection Splitter -->
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="230" y2="250"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="220" x2="580" y1="250" y2="250"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="220" x2="220" y1="250" y2="270"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="250" y2="270"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="580" x2="580" y1="250" y2="270"/>
+
+        <!-- App Servers -->
+        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="140" x="150" y="270"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="220" y="295">App Server 1</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="220" y="315">FastAPI/Uvicorn</text>
+
+        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="140" x="330" y="270"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="400" y="295">App Server 2</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="400" y="315">FastAPI/Uvicorn</text>
+
+        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="140" x="510" y="270"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="580" y="295">Celery Workers</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="580" y="315">PDF Gen / Processing</text>
+
+        <!-- Connections to Internal DBs -->
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="220" x2="220" y1="330" y2="380"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="330" y2="380"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="580" x2="580" y1="330" y2="380"/>
+
+        <!-- Internal Data Sources -->
+        <rect fill="#1f2937" height="50" rx="8" stroke="#3947e3" stroke-width="1.5" width="140" x="150" y="380"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="220" y="402">PostgreSQL</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" x="220" y="418">Sensitive User Data</text>
+
+        <rect fill="#1f2937" height="50" rx="8" stroke="#ef6f74" stroke-width="1.5" width="140" x="330" y="380"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="400" y="402">Redis / ChromaDB</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" x="400" y="418">Cache & AI Memory</text>
+
+        <rect fill="#1f2937" height="50" rx="8" stroke="#38b6ad" stroke-width="1.5" width="140" x="510" y="380"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="580" y="402">Hetzner Storage</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" x="580" y="418">Internal / Sensitive Docs</text>
+
+        <!-- Connection Out to External APIs / Storage -->
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="220" x2="220" y1="460" y2="520"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="580" x2="580" y1="460" y2="520"/>
+
+        <!-- External APIs & Storage -->
+        <rect fill="#1f2937" height="60" rx="12" stroke="rgba(255,255,255,.4)" stroke-width="1.5" width="220" x="110" y="520"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle" x="220" y="546">External LLM APIs</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="220" y="565">OpenAI GPT-4 • Anthropic</text>
+
+        <rect fill="#1f2937" height="60" rx="12" stroke="#efc62e" stroke-width="1.5" width="220" x="470" y="520"/>
+        <text fill="#efc62e" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle" x="580" y="546">AWS S3 (India Region)</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="580" y="565">Cost-optimized Media Content</text>
+
+      </svg>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- AI ORCHESTRATION -->
+<section class="section dark" id="ai-engine">
+<div class="wrap">
+  <div class="section-head">
+    <div class="overline">Core IP</div>
+    <h2>AI/LLM Orchestration Strategy</h2>
+    <p>The platform's true differentiator is its internal AI content generation pipeline. Rather than directly exposing a generic chatbot, we use an advanced RAG (Retrieval-Augmented Generation) engine to synthesize pedagogically accurate materials based on proprietary templates.</p>
+  </div>
+  
+  <div class="value-grid">
+    <div class="value-box" style="background: #1a1e2b;">
+      <span class="badge badge-ai">Multi-Provider</span>
+      <h3>LLM Integration Hub</h3>
+      <p>Provider-agnostic design securely connects to both <strong>OpenAI (GPT-4)</strong> and <strong>Anthropic (Claude 3.5)</strong> APIs, allowing seamless switching based on task complexity, cost optimization, or model availability.</p>
+    </div>
+    <div class="value-box" style="background: #1a1e2b;">
+      <span class="badge badge-ai">LangChain</span>
+      <h3>Advanced RAG Engine</h3>
+      <p>Utilizes LangChain and embedded ChromaDB to index PDF templates. When creators request content, the engine retrieves relevant pedagogical context, injecting style rules directly into the LLM system prompt.</p>
+    </div>
+    <div class="value-box" style="background: #1a1e2b;">
+      <span class="badge badge-ai">Real-Time</span>
+      <h3>WebSocket Streaming</h3>
+      <p>Continuous AI chat session handling via fast WebSockets. Ensures editors get real-time token streaming for instantaneous feedback during the iterative magazine design process.</p>
+    </div>
+    <div class="value-box" style="background: #1a1e2b;">
+      <span class="badge badge-ai">Automation</span>
+      <h3>Playwright PDF Gen</h3>
+      <p>AI-generated <strong>TypeScript and Tailwind CSS components</strong> are compiled and passed to asynchronous background Celery workers utilizing headless Chromium (Playwright) to construct pixel-perfect, print-ready PDFs without UI freezing.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- TECH STACK -->
+<section class="section light" id="stack">
+<div class="wrap">
+  <div class="section-head">
+    <div class="overline">Technical Stack</div>
+    <h2>Engineered for Scale</h2>
+    <p>A strictly typed, highly performant stack ensuring rapid development cycles, minimal technical debt, and instant global delivery.</p>
+  </div>
+  
+  <div class="spec-grid">
+    <article class="spec-card cream">
+      <div class="tech-icon">⚛</div>
+      <h3>Frontend Application</h3>
+      <ul>
+        <li><strong>Framework:</strong> Next.js 14+ (React 18+) with App Router</li>
+        <li><strong>Language:</strong> Strict TypeScript for type safety</li>
+        <li><strong>Styling:</strong> Tailwind CSS & Radix UI (Headless components)</li>
+        <li><strong>State Management:</strong> Zustand & TanStack Query</li>
+        <li><strong>Media Viewing:</strong> Custom PDF.js integration & HTML5 Players</li>
+        <li><strong>UX:</strong> Two-pane Creator interface (AI Chat left, Live Preview right)</li>
+      </ul>
+    </article>
+    
+    <article class="spec-card dark">
+      <div class="tech-icon">⚡</div>
+      <h3 style="color: white;">Backend Services</h3>
+      <ul>
+        <li><strong>Framework:</strong> Python 3.11+ with FastAPI</li>
+        <li><strong>Concurrency:</strong> Async/await patterns (Uvicorn + Gunicorn)</li>
+        <li><strong>Database ORM:</strong> SQLAlchemy 2.0 + Alembic Migrations</li>
+        <li><strong>Task Queue:</strong> Celery backed by Redis 7+</li>
+        <li><strong>Authentication:</strong> stateless JWT tokens (HS256)</li>
+        <li><strong>File Management:</strong> Boto3 S3 integration</li>
+      </ul>
+    </article>
+    
+    <article class="spec-card dark">
+      <div class="tech-icon">☁</div>
+      <h3 style="color: white;">Infrastructure & DevOps</h3>
+      <ul>
+        <li><strong>CDN / Edge:</strong> Cloudflare (DDoS protection, Global caching)</li>
+        <li><strong>Primary Hosting:</strong> Hetzner (Frankfurt) - Strict GDPR isolation</li>
+        <li><strong>Media Storage:</strong> AWS S3 (India) - Massive cost reduction for heavy assets</li>
+        <li><strong>Containerization:</strong> Docker & Docker Compose workflows</li>
+        <li><strong>CI/CD:</strong> GitHub Actions pipeline (Automated PyTest, coverage, deploy)</li>
+        <li><strong>Monitoring:</strong> Sentry Error Tracking</li>
+      </ul>
+    </article>
+
+    <article class="spec-card cream">
+      <div class="tech-icon">🛡</div>
+      <h3>Security & Authorization</h3>
+      <ul>
+        <li><strong>Auth:</strong> Encrypted password hashing (bcrypt)</li>
+        <li><strong>RBAC Middleware:</strong> Granular permissions (Super Admin, Admin, Creator, User)</li>
+        <li><strong>Data Isolation:</strong> Hard segregation between internal creator instances and external school viewer access</li>
+        <li><strong>Audit Logging:</strong> Dedicated tables tracking all system-level modifications</li>
+      </ul>
+    </article>
+  </div>
+</div>
+</section>
+
+<!-- DATABASE SCHEMA -->
+<section class="section dark" id="database">
+<div class="wrap">
+  <div class="section-head">
+    <div class="overline">Data Layer</div>
+    <h2>Relational & Vector Schemas</h2>
+    <p>We leverage PostgreSQL as the primary source of truth for transactional data, ensuring ACID compliance and deep relational mapping for complex license models, while extending to Vector formats (ChromaDB) for LLM memory.</p>
+  </div>
+  
+  <div class="schema-grid">
+    <div class="schema-box">
+      <span class="badge badge-core">Auth & Users</span>
+      <h4>User Management</h4>
+      <div class="code-font">
+        <span class="type">UUID</span> <span class="key">id</span> PK<br>
+        <span class="type">VARCHAR</span> <span class="key">email</span> UNIQUE<br>
+        <span class="type">VARCHAR</span> <span class="key">password_hash</span><br>
+        <span class="type">VARCHAR</span> <span class="key">role</span> (ENUM)<br>
+        <span class="type">BOOLEAN</span> <span class="key">is_active</span>
+      </div>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Complete RBAC capability with refresh token tracking, profile mapping, and granular permission linking.</p>
+    </div>
+    
+    <div class="schema-box">
+      <span class="badge badge-core">Content Engine</span>
+      <h4>Magazines & Templates</h4>
+      <div class="code-font">
+        <span class="type">UUID</span> <span class="key">id</span> PK<br>
+        <span class="type">JSONB</span> <span class="key">content_data</span><br>
+        <span class="type">UUID</span> <span class="key">template_id</span> FK<br>
+        <span class="type">VARCHAR</span> <span class="key">status</span> (ENUM)<br>
+        <span class="type">INT</span> <span class="key">grade_level</span>
+      </div>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Uses PostgreSQL's JSONB for ultra-flexible content rendering, supporting endless template variations safely.</p>
+    </div>
+
+    <div class="schema-box">
+      <span class="badge badge-core">Business Logic</span>
+      <h4>Access Licenses (B2B/C)</h4>
+      <div class="code-font">
+        <span class="type">UUID</span> <span class="key">id</span> PK<br>
+        <span class="type">VARCHAR</span> <span class="key">license_type</span><br>
+        <span class="type">UUID</span> <span class="key">user_id</span> FK<br>
+        <span class="type">TIMESTAMP</span> <span class="key">valid_until</span><br>
+        <span class="type">INT</span> <span class="key">max_concurrent</span>
+      </div>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Engineered specifically for the EdTech market. Handles single users and massive B2B school concurrency limits.</p>
+    </div>
+
+    <div class="schema-box">
+      <span class="badge badge-core">Media & Assets</span>
+      <h4>Media Files</h4>
+      <div class="code-font">
+        <span class="type">UUID</span> <span class="key">id</span> PK<br>
+        <span class="type">VARCHAR</span> <span class="key">file_url</span><br>
+        <span class="type">VARCHAR</span> <span class="key">mime_type</span><br>
+        <span class="type">VARCHAR</span> <span class="key">storage_loc</span><br>
+        <span class="type">JSONB</span> <span class="key">metadata</span>
+      </div>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Bridging localized DB records strictly in Germany to heavy media assets stored in cost-effective AWS S3 India buckets.</p>
+    </div>
+
+    <div class="schema-box">
+      <span class="badge badge-core">Analytics & Audit</span>
+      <h4>Telemetry Tracking</h4>
+      <div class="code-font">
+        <span class="type">UUID</span> <span class="key">id</span> PK<br>
+        <span class="type">UUID</span> <span class="key">user_id</span> FK<br>
+        <span class="type">VARCHAR</span> <span class="key">event_type</span><br>
+        <span class="type">JSONB</span> <span class="key">event_data</span><br>
+        <span class="type">INT</span> <span class="key">progress_pct</span>
+      </div>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Granular logging tracks lesson completion rates, time-on-page metrics, and essential GDPR compliance trails.</p>
+    </div>
+
+    <div class="schema-box">
+      <span class="badge badge-ai">AI Context Memory</span>
+      <h4>AI Chat Sessions</h4>
+      <div class="code-font">
+        <span class="type">UUID</span> <span class="key">id</span> PK<br>
+        <span class="type">UUID</span> <span class="key">session_id</span> FK<br>
+        <span class="type">VARCHAR</span> <span class="key">role</span> (user/ai)<br>
+        <span class="type">TEXT</span> <span class="key">content</span><br>
+        <span class="type">INT</span> <span class="key">tokens_used</span>
+      </div>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Preserves historical conversation context allowing LLMs to refine content iteratively based on editor feedback.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- INVESTOR SUMMARY -->
+<section class="section light" id="investment">
+<div class="wrap final-grid">
+  <div>
+    <div class="section-head">
+      <div class="overline">Executive Conclusion</div>
+      <h2>Investment & Tech Readiness</h2>
+      <p>The Lehrcraft platform is not just a concept; it is a meticulously architected ecosystem. By isolating AI orchestration to the backend content creation process, we eliminate hallucination risks for students while dramatically lowering production costs.</p>
+      <p style="color: black; margin-top: 20px;">The use of enterprise-grade standards (Next.js, FastAPI, PostgreSQL, AWS/S3 paradigms) ensures that capital is deployed on scaling content and sales, rather than rewriting technical debt.</p>
+    </div>
+  </div>
+  <div class="quote-box">
+    <p>"An airtight technical foundation designed for the strict GDPR requirements of the DACH education market."</p>
+    <p class="small">The combination of Python's heavy-lifting AI capabilities and Next.js's edge-network frontend delivery creates a robust EdTech engine. With our documented CI/CD pipelines, containerized deployments, and stateless JWT architecture, the platform is ready for immediate user acquisition and horizontal scaling.</p>
+    <div style="margin-top: 24px; display: flex; gap: 10px;">
+      <div class="chip fill-blue" style="font-size: 12px;">✓ Due Diligence Ready</div>
+      <div class="chip fill-teal" style="font-size: 12px;">✓ GDPR Compliant</div>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+</body>
+</html>
