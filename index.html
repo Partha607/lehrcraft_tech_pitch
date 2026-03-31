@@ -547,7 +547,20 @@
         <span class="type">VARCHAR</span> <span class="key">status</span> (ENUM)<br>
         <span class="type">INT</span> <span class="key">grade_level</span>
       </div>
-      <p style="font-size: 13px; color: #999; margin-top: 12px;">Uses PostgreSQL's JSONB for ultra-flexible content rendering, supporting endless template variations safely.</p>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Uses PostgreSQL's JSONB for ultra-flexible content rendering. Because the DB is in Germany, embedded file locations within the JSON route through the global CDN to pull assets from India.</p>
+    </div>
+
+    <div class="schema-box">
+      <span class="badge badge-core">Business Logic</span>
+      <h4>Access Licenses (B2B/C)</h4>
+      <div class="code-font">
+        <span class="type">UUID</span> <span class="key">id</span> PK<br>
+        <span class="type">VARCHAR</span> <span class="key">license_type</span><br>
+        <span class="type">UUID</span> <span class="key">user_id</span> FK<br>
+        <span class="type">TIMESTAMP</span> <span class="key">valid_until</span><br>
+        <span class="type">INT</span> <span class="key">max_concurrent</span>
+      </div>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Engineered specifically for the EdTech market. Handles single users and massive B2B school concurrency limits.</p>
     </div>
 
     <div class="schema-box">
@@ -568,12 +581,12 @@
       <h4>Media Files</h4>
       <div class="code-font">
         <span class="type">UUID</span> <span class="key">id</span> PK<br>
-        <span class="type">VARCHAR</span> <span class="key">file_url</span><br>
+        <span class="type">VARCHAR</span> <span class="key">file_url</span> (CDN)<br>
         <span class="type">VARCHAR</span> <span class="key">mime_type</span><br>
-        <span class="type">VARCHAR</span> <span class="key">storage_loc</span><br>
+        <span class="type">VARCHAR</span> <span class="key">storage_loc</span> (India)<br>
         <span class="type">JSONB</span> <span class="key">metadata</span>
       </div>
-      <p style="font-size: 13px; color: #999; margin-top: 12px;">Bridging localized DB records strictly in Germany to heavy media assets stored in cost-effective AWS S3 India buckets.</p>
+      <p style="font-size: 13px; color: #999; margin-top: 12px;">Bridging localized DB records in Germany to media assets in India. The `file_url` points to the global CDN to efficiently fetch and cache the cost-effective S3 files.</p>
     </div>
 
     <div class="schema-box">
