@@ -331,7 +331,7 @@
     <div class="overline">Infrastructure Strategy</div>
     <h2>Deployment Architecture</h2>
     <div class="underline-swoosh"></div>
-    <p style="margin-top:18px;">Built on Docker Compose for deterministic environments and deployed across distributed CDNs. <strong>Strategic Data Split:</strong> Sensitive user data is strictly held in Germany (Hetzner/PostgreSQL) for absolute GDPR compliance, while heavy media content is offloaded to AWS S3 buckets in India for massive cost reduction.</p>
+    <p style="margin-top:18px;">Built on Docker Compose for deterministic environments and deployed across distributed CDNs. <strong>Strategic Data Split:</strong> Application servers (AWS EC2) and file storage (AWS S3) are hosted in India for massive cost reduction and operational efficiency. Meanwhile, sensitive user data and relational databases are strictly isolated in Germany (PostgreSQL) for absolute GDPR compliance.</p>
   </div>
 
   <div class="arch-grid">
@@ -347,66 +347,69 @@
         <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="400" y="75">DDoS Protection • SSL Termination • Edge Caching</text>
 
         <!-- Connections Down -->
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="90" y2="140"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="90" y2="130"/>
 
-        <!-- Hosting Boundary -->
-        <rect fill="transparent" height="320" rx="16" stroke="rgba(255,255,255,.15)" stroke-dasharray="8 4" stroke-width="2" width="700" x="50" y="140"/>
-        <text fill="#fff" font-family="monospace" font-size="12" letter-spacing="1" x="70" y="165">GERMANY HOSTING (Strict GDPR Boundary)</text>
+        <!-- Hosting Boundary India -->
+        <rect fill="transparent" height="260" rx="16" stroke="#efc62e" stroke-dasharray="8 4" stroke-width="2" width="700" x="50" y="130"/>
+        <text fill="#efc62e" font-family="monospace" font-size="12" letter-spacing="1" x="70" y="155">INDIA REGION (AWS EC2 Compute &amp; S3 Storage)</text>
 
         <!-- Load Balancer -->
-        <rect fill="#1f2937" height="50" rx="8" stroke="#38b6ad" stroke-width="1.5" width="240" x="280" y="180"/>
-        <text fill="#38b6ad" font-family="Inter,sans-serif" font-size="14" font-weight="700" text-anchor="middle" x="400" y="210">Load Balancer</text>
+        <rect fill="#1f2937" height="46" rx="8" stroke="#38b6ad" stroke-width="1.5" width="240" x="280" y="180"/>
+        <text fill="#38b6ad" font-family="Inter,sans-serif" font-size="14" font-weight="700" text-anchor="middle" x="400" y="208">Load Balancer</text>
 
-        <!-- Connection Splitter -->
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="230" y2="250"/>
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="220" x2="580" y1="250" y2="250"/>
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="220" x2="220" y1="250" y2="270"/>
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="250" y2="270"/>
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="580" x2="580" y1="250" y2="270"/>
+        <!-- Connection Splitter LB -> Apps -->
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="226" y2="246"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="145" x2="445" y1="246" y2="246"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="145" x2="145" y1="246" y2="270"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="295" x2="295" y1="246" y2="270"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="445" x2="445" y1="246" y2="270"/>
 
-        <!-- App Servers -->
-        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="140" x="150" y="270"/>
-        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="220" y="295">App Server 1</text>
-        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="220" y="315">FastAPI/Uvicorn</text>
+        <!-- App Servers & Workers (EC2) -->
+        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="130" x="80" y="270"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="145" y="295">EC2 App 1</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="145" y="315">FastAPI</text>
 
-        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="140" x="330" y="270"/>
-        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="400" y="295">App Server 2</text>
-        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="400" y="315">FastAPI/Uvicorn</text>
+        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="130" x="230" y="270"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="295" y="295">EC2 App 2</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="295" y="315">FastAPI</text>
 
-        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="140" x="510" y="270"/>
-        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="580" y="295">Celery Workers</text>
-        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="580" y="315">PDF Gen / Processing</text>
+        <rect fill="#1f2937" height="60" rx="8" stroke="#efc62e" stroke-width="1.5" width="130" x="380" y="270"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="445" y="295">EC2 Celery</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="445" y="315">Workers</text>
 
-        <!-- Connections to Internal DBs -->
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="220" x2="220" y1="330" y2="380"/>
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="400" x2="400" y1="330" y2="380"/>
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="580" x2="580" y1="330" y2="380"/>
+        <!-- Redis Cache (India) -->
+        <rect fill="#1f2937" height="60" rx="8" stroke="#ef6f74" stroke-width="1.5" width="90" x="530" y="270"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="575" y="295">Redis</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="575" y="315">Cache</text>
 
-        <!-- Internal Data Sources -->
-        <rect fill="#1f2937" height="50" rx="8" stroke="#3947e3" stroke-width="1.5" width="140" x="150" y="380"/>
-        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="220" y="402">PostgreSQL</text>
-        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" x="220" y="418">Sensitive User Data</text>
+        <!-- S3 (India) -->
+        <rect fill="#1f2937" height="60" rx="8" stroke="#38b6ad" stroke-width="1.5" width="90" x="640" y="270"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="685" y="295">AWS S3</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="685" y="315">Storage</text>
 
-        <rect fill="#1f2937" height="50" rx="8" stroke="#ef6f74" stroke-width="1.5" width="140" x="330" y="380"/>
-        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="400" y="402">Redis / ChromaDB</text>
-        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" x="400" y="418">Cache & AI Memory</text>
+        <!-- Connections Apps to DB & APIs -->
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="215" x2="215" y1="330" y2="480"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="445" x2="445" y1="330" y2="380"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="585" x2="585" y1="380" y2="480"/>
+        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="445" x2="585" y1="380" y2="380"/>
 
-        <rect fill="#1f2937" height="50" rx="8" stroke="#38b6ad" stroke-width="1.5" width="140" x="510" y="380"/>
-        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="580" y="402">Hetzner Storage</text>
-        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" x="580" y="418">Internal / Sensitive Docs</text>
+        <!-- Hosting Boundary Germany -->
+        <rect fill="transparent" height="150" rx="16" stroke="#3947e3" stroke-dasharray="8 4" stroke-width="2" width="330" x="50" y="430"/>
+        <text fill="#8892f8" font-family="monospace" font-size="12" letter-spacing="1" x="70" y="455">GERMANY</text>
 
-        <!-- Connection Out to External APIs / Storage -->
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="220" x2="220" y1="460" y2="520"/>
-        <line stroke="rgba(255,255,255,.3)" stroke-width="2" x1="580" x2="580" y1="460" y2="520"/>
+        <!-- PostgreSQL Germany -->
+        <rect fill="#1f2937" height="60" rx="8" stroke="#3947e3" stroke-width="1.5" width="160" x="135" y="480"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="215" y="505">PostgreSQL DB</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="215" y="525">Sensitive User Data</text>
 
-        <!-- External APIs & Storage -->
-        <rect fill="#1f2937" height="60" rx="12" stroke="rgba(255,255,255,.4)" stroke-width="1.5" width="220" x="110" y="520"/>
-        <text fill="#fff" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle" x="220" y="546">External LLM APIs</text>
-        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="220" y="565">OpenAI GPT-4 • Anthropic</text>
+        <!-- Boundary External -->
+        <rect fill="transparent" height="150" rx="16" stroke="rgba(255,255,255,.2)" stroke-dasharray="8 4" stroke-width="2" width="330" x="420" y="430"/>
+        <text fill="#fff" font-family="monospace" font-size="12" letter-spacing="1" x="440" y="455">EXTERNAL SERVICES</text>
 
-        <rect fill="#1f2937" height="60" rx="12" stroke="#efc62e" stroke-width="1.5" width="220" x="470" y="520"/>
-        <text fill="#efc62e" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle" x="580" y="546">AWS S3 (India Region)</text>
-        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="580" y="565">Cost-optimized Media Content</text>
+        <!-- LLMs External -->
+        <rect fill="#1f2937" height="60" rx="8" stroke="rgba(255,255,255,.4)" stroke-width="1.5" width="160" x="505" y="480"/>
+        <text fill="#fff" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle" x="585" y="505">LLM APIs</text>
+        <text fill="#c8c0ac" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="585" y="525">OpenAI • Anthropic</text>
 
       </svg>
     </div>
@@ -489,8 +492,8 @@
       <h3 style="color: white;">Infrastructure & DevOps</h3>
       <ul>
         <li><strong>CDN / Edge:</strong> Cloudflare (DDoS protection, Global caching)</li>
-        <li><strong>Primary Hosting:</strong> Hetzner (Frankfurt) - Strict GDPR isolation</li>
-        <li><strong>Media Storage:</strong> AWS S3 (India) - Massive cost reduction for heavy assets</li>
+        <li><strong>Compute & Storage:</strong> AWS EC2 & S3 (India) - Massive cost reduction for compute and heavy assets</li>
+        <li><strong>Database Hosting:</strong> Germany - Strict GDPR isolation for PostgreSQL</li>
         <li><strong>Containerization:</strong> Docker & Docker Compose workflows</li>
         <li><strong>CI/CD:</strong> GitHub Actions pipeline (Automated PyTest, coverage, deploy)</li>
         <li><strong>Monitoring:</strong> Sentry Error Tracking</li>
